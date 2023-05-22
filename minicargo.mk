@@ -40,7 +40,7 @@ MRUSTC ?= bin/mrustc$(EXESUF)
 # MINICARGO : Executable path to `minicargo`
 MINICARGO ?= bin/minicargo$(EXESUF)
 # LLVM_TARGETS : Target list for llvm
-LLVM_TARGETS ?= X86;ARM;AArch64#;Mips;PowerPC;SystemZ;JSBackend;MSP430;Sparc;NVPTX
+LLVM_TARGETS ?= X86
 
 ifeq ($(OS),Windows_NT)
   OVERRIDE_SUFFIX ?= -windows
