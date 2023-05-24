@@ -19,6 +19,7 @@ Progress
 - Supported Targets:
   - x86-64 linux GNU (fully bootstrap tested using Debian 10.9)
   - x86-64 windows MSVC (runnable executables on Windows 10, but bootstrap hasn't been fully tested)
+  - (incomplete) x86-64 Cygwin (buggy, unstable and WIP, everything hasn't been fully tested)
   - x86_64 and arm64 macOS
   - (incomplete) x86 windows MSVC
 - `rustc` bootstrap tested and validated (1.19.0 isn't fully repeatable, but later versions are)
