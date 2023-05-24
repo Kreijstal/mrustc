@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 export RUSTC_VERSION=1.54.0 MRUSTC_TARGET_VER=1.54 OUTDIR_SUF=-1.54.0
-make
+make -j $(($(nproc) - 1))
 make RUSTCSRC
 make -f minicargo.mk LIBS
 make test
