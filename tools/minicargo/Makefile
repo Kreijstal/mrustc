@@ -36,6 +36,9 @@ $(BIN): $(OBJS) ../../bin/common_lib.a
 	@echo [CXX] -o $@
 	$V$(CXX) -o $@ $(OBJS) ../../bin/common_lib.a $(LINKFLAGS)
 ifeq ($(OS),Windows_NT)
+ifeq ($(shell echo $$OSTYPE),cygwin)
+	strip $(BIN)
+endif
 else ifeq ($(shell uname -s || echo not),Darwin)
 else
 	objcopy --only-keep-debug $(BIN) $(BIN).debug

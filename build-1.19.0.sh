@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 export RUSTC_VERSION=1.19.0 MRUSTC_TARGET_VER=1.19 OUTDIR_SUF=-1.19.0
+if [ "$OSTYPE" = "cygwin" ]; then
+    export CXXFLAGS_EXTRA="-D_GNU_SOURCE=1"
+fi
 make -j $(($(nproc) - 1))
 make -f minicargo.mk RUSTCSRC
 make -f minicargo.mk LIBS

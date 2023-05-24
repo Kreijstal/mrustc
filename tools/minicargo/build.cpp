@@ -1337,7 +1337,7 @@ const helpers::path& get_mrustc_path()
         s_compiler_path = minicargo_path / "mrustc.exe";
 #else
         char buf[PATH_MAX];
-# ifdef __linux__
+# if defined(__linux__) || defined(__CYGWIN__)
         ssize_t s = readlink("/proc/self/exe", buf, sizeof(buf)-1);
         if(s >= 0)
         {

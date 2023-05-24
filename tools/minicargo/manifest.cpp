@@ -18,6 +18,8 @@
 // TODO: Extract this from the target at runtime (by invoking the compiler on the passed target)
 #ifdef _WIN32
 # define TARGET_NAME    "i586-windows-msvc"
+#elif defined(__CYGWIN__)
+# define TARGET_NAME	"x86_64-pc-cygwin"
 #elif defined(__NetBSD__)
 # define TARGET_NAME "x86_64-unknown-netbsd"
 #else

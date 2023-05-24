@@ -162,6 +162,9 @@ $(BIN): $(OBJDIR)main.o bin/mrustc.a bin/common_lib.a
 	@echo [CXX] -o $@
 ifeq ($(OS),Windows_NT)
 	$V$(CXX) -o $@ $(LINKFLAGS) $(OBJDIR)main.o -Wl,--whole-archive bin/mrustc.a bin/common_lib.a -Wl,--no-whole-archive $(LIBS)
+ifeq ($(shell echo $$OSTYPE),cygwin)
+	strip $(BIN)
+endif
 else ifeq ($(shell uname -s || echo not),Darwin)
 	$V$(CXX) -o $@ $(LINKFLAGS) $(OBJDIR)main.o -Wl,-all_load bin/mrustc.a bin/common_lib.a $(LIBS)
 else

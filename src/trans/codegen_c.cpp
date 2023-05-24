@@ -874,6 +874,9 @@ namespace {
                         for(size_t j = 0; j < method.n_args; j ++)
                             H::ty_args(args, method.args[j]);
                         H::emit_proto(m_of, method, "__rust_", args); m_of << " {\n";
+                        if (Target_GetCurSpec().m_os_name == "cygwin") {
+                            m_of << "\t__attribute__((weak)) ";
+                        }
                         m_of << "\textern "; H::emit_proto(m_of, method, alloc_prefix, args); m_of << ";\n";
                         m_of << "\t";
                         if(method.ret != AllocatorDataTy::Unit)
@@ -893,6 +896,9 @@ namespace {
                     {
                         auto oom_method = m_crate.get_lang_item_path_opt("mrustc-alloc_error_handler");
                         m_of << "void __rust_alloc_error_handler(uintptr_t s, uintptr_t a) {\n";
+                        if (Target_GetCurSpec().m_os_name == "cygwin") {
+                            m_of << "\t__attribute__((weak)) ";
+                        }
                         if(oom_method == HIR::SimplePath()) {
                             m_of << "\tvoid __rdl_oom(uintptr_t, uintptr_t);\n";
                             m_of << "\t__rdl_oom(s,a);\n";
@@ -1174,6 +1180,11 @@ namespace {
 #else
             bool is_windows = false;
 #endif
+#ifdef __CYGWIN__
+            bool is_cygwin = true;
+#else
+            bool is_cygwin = false;
+#endif
             size_t  arg_file_start = 0;
             switch( m_compiler )
             {
@@ -1205,6 +1216,9 @@ namespace {
                 {
                     args.push_back( a.c_str() );
                 }
+                if (is_cygwin) {
+                    args.push_back("-Os");
+                } else {
                 switch(opt.opt_level)
                 {
                 case 0: break;
@@ -1215,11 +1229,16 @@ namespace {
                     args.push_back("-O2");
                     break;
                 }
+                }
                 if( opt.emit_debug_info )
                 {
                     args.push_back("-g");
                 }
                 args.push_back("-fPIC");
+                if (is_cygwin) {
+                    args.push_back("-s");
+                    args.push_back("-Wa,-mbig-obj");
+                }
                 args.push_back("-o");
                 switch(out_ty)
                 {
@@ -1232,7 +1251,9 @@ namespace {
                     args.push_back(m_outfile_path+".o");
                     break;
                 }
+                if (!is_cygwin) {
                 args.push_back(m_outfile_path_c.c_str());
+                }
                 switch(out_ty)
                 {
                 case CodegenOutput::DynamicLibrary:
@@ -1283,6 +1304,9 @@ namespace {
                 case CodegenOutput::Object:
                     args.push_back("-c");
                     break;
+                }
+                if (is_cygwin) {
+                    args.push_back(m_outfile_path_c.c_str());
                 }
                 break;
             case Compiler::Msvc:
@@ -2585,6 +2609,9 @@ namespace {
             }
             else
             {
+                if (Target_GetCurSpec().m_os_name == "cygwin") {
+                    m_of << "__attribute__((weak)) ";
+                }
                 m_of << "extern ";
             }
             emit_function_header(p, item, params);

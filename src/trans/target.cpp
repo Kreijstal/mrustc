@@ -503,6 +503,13 @@ namespace
                 ARCH_X86_64
                 };
         }
+        else if(target_name == "x86_64-pc-cygwin")
+        {
+            return TargetSpec {
+                "unix", "cygwin", "gnu", {CodegenMode::Gnu11, true, "x86_64-pc-cygwin", BACKEND_C_OPTS_GNU},
+                ARCH_X86_64
+                };
+        }
         else if(target_name == "i686-unknown-freebsd")
         {
             return TargetSpec {
@@ -673,6 +680,12 @@ void Target_SetCfg(const ::std::string& target_name)
     if( g_target.m_os_name == "freebsd" )
     {
         Cfg_SetFlag("freebsd");
+        Cfg_SetValue("target_vendor", "unknown");
+    }
+
+    if( g_target.m_os_name == "cygwin" )
+    {
+        Cfg_SetFlag("cygwin");
         Cfg_SetValue("target_vendor", "unknown");
     }
 

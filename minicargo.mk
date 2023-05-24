@@ -8,6 +8,9 @@ ifeq ($(OS),Windows_NT)
   EXESUF := .exe
 endif
 
+CYGWIN_RUSTC_VERSION := 30d50a4141b1b0e70857211b9bb2cf493ed8c546
+CYGWIN_RUSTC_NAME := rustc-$(RUSTC_VERSION)-cygwin-dirty
+
 # -------------------
 # ----- INPUTS ------
 # -------------------
@@ -43,7 +46,11 @@ MINICARGO ?= bin/minicargo$(EXESUF)
 LLVM_TARGETS ?= X86
 
 ifeq ($(OS),Windows_NT)
+ifeq ($(shell echo $$OSTYPE),cygwin)
+  OVERRIDE_SUFFIX ?= -cygwin
+else
   OVERRIDE_SUFFIX ?= -windows
+endif
 else ifeq ($(shell uname -s || echo not),Darwin)
   OVERRIDE_SUFFIX ?= -macos
 else
@@ -128,7 +135,11 @@ ifeq ($(shell uname -s || echo not),Darwin)
    RUSTC_TARGET ?= x86_64-apple-darwin
  endif
 else ifeq ($(OS),Windows_NT)
+ifeq ($(shell echo $$OSTYPE),cygwin)
+  RUSTC_TARGET ?= x86_64-cygwin
+else
   RUSTC_TARGET ?= x86_64-windows-gnu
+endif
 else
   RUSTC_TARGET ?= x86_64-unknown-linux-gnu
 endif
@@ -181,10 +192,18 @@ RUSTC_SRC_TARBALL := rustc-$(RUSTC_VERSION)-src.tar.gz
 $(RUSTC_SRC_TARBALL):
 	@echo [CURL] $@
 	@rm -f $@
+ifeq ($(shell echo $$OSTYPE),cygwin)
+	@curl -sS https://github.com/ookiineko/$(CYGWIN_RUSTC_NAME)/archive/$(CYGWIN_RUSTC_VERSION).tar.gz -o $@
+else
 	@curl -sS https://static.rust-lang.org/dist/$@ -o $@
+endif
 $(RUSTC_SRC_DL): $(RUSTC_SRC_TARBALL) rustc-$(RUSTC_VERSION)-src.patch
 	tar -xf $(RUSTC_SRC_TARBALL)
+ifeq ($(shell echo $$OSTYPE),cygwin)
+	mv $(CYGWIN_RUSTC_NAME)-$(CYGWIN_RUSTC_VERSION) rustc-$(RUSTC_VERSION)-src
+else
 	cd $(RUSTCSRC) && patch -p0 < ../rustc-$(RUSTC_VERSION)-src.patch;
+endif
 	touch $(RUSTC_SRC_DL)
 
 # Standard library crates
